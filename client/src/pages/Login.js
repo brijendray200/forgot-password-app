@@ -6,6 +6,7 @@ import './Auth.css';
 function Login() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,14 +55,19 @@ function Login() {
             className="input-field"
           />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="input-field"
-          />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="input-field"
+            />
+            <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
 
           <button type="submit" disabled={isLoading} className="submit-btn">
             {isLoading ? 'Logging in...' : 'Login'}

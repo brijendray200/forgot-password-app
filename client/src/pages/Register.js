@@ -11,6 +11,8 @@ function Register() {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -97,25 +99,35 @@ function Register() {
             className="input-field"
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
+            <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
 
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+          <div className="password-wrapper">
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="input-field"
+            />
+            <span className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+              {showConfirmPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
 
           <button type="submit" disabled={isLoading} className="submit-btn">
             {isLoading ? 'Creating Account...' : 'Register'}

@@ -105,3 +105,25 @@
 .links a:hover {
   color: #764ba2;
 }
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.password-wrapper .input-field {
+  margin-bottom: 0;
+  padding-right: 45px;
+  width: 100%;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}
