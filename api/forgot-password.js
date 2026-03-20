@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-let isConnected = false;
+let cachedDb = null;
+
 async function connectDB() {
-  if (isConnected) return;
-  await mongoose.connect(process.env.MONGODB_URI);
-  isConnected = true;
+  if (cachedDb && mongoose.connection.readyState === 1) return cachedDb;
+  const db = await mongoose.connect(process.env.MONGODB_URI);
+  cachedDb = db;
+  return db;
 }
 
-const userSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   phone: { type: String, required: true, unique: true },
@@ -16,15 +18,14 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const resetSchema = new mongoose.Schema({
+const ResetSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   identifier: { type: String, required: true },
-  type: { type: String, enum: ['email', 'phone'], required: true },
   requestedAt: { type: Date, default: Date.now }
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
-const PasswordReset = mongoose.models.PasswordReset || mongoose.model('PasswordReset', resetSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+const PasswordReset = mongoose.models.PasswordReset || mongoose.model('PasswordReset', ResetSchema);
 
 function generatePassword(length = 12) {
   const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -70,7 +71,7 @@ module.exports = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    await PasswordReset.create({ userId: user._id, identifier, type });
+    await PasswordReset.create({ userId: user._id, identifier });
 
     // Log password for demo (in production send via email/SMS)
     console.log(`New password for ${identifier}: ${newPassword}`);
