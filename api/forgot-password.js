@@ -73,14 +73,40 @@ module.exports = async (req, res) => {
 
     await PasswordReset.create({ userId: user._id, identifier });
 
-    // Log password for demo (in production send via email/SMS)
-    console.log(`New password for ${identifier}: ${newPassword}`);
+    // Send email if type is email
+    if (type === 'email') {
+      const nodemailer = require('nodemailer');
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"Password Reset" <${process.env.EMAIL_USER}>`,
+        to: identifier,
+        subject: 'Your New Password',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #667eea;">Password Reset Successful</h2>
+            <p>Hi ${user.name},</p>
+            <p>Your new password is:</p>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0; text-align:center;">
+              <strong style="font-size: 22px; color: #667eea; letter-spacing: 2px;">${newPassword}</strong>
+            </div>
+            <p style="color: #666;">Please login and change your password immediately.</p>
+          </div>
+        `
+      });
+    }
 
     res.json({
       success: true,
-      message: `Password reset successful! New password sent to your ${type}.`,
-      // Remove in production:
-      newPassword
+      message: `Password reset successful! New password sent to your ${type}.`
     });
   } catch (error) {
     console.error('Forgot password error:', error);
